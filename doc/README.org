@@ -21,7 +21,7 @@ All connections with labels have a color generated for each unique label string.
 
 To override this, ~:labels~ can be used to set explicit colors for certain strings.
 
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:labels
@@ -43,7 +43,7 @@ To override this, ~:labels~ can be used to set explicit colors for certain strin
 :PROPERTIES:
 :ID:       7ef5485c-997f-4122-8322-d5b435b6eeeb
 :END:
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:chain a b c)
@@ -59,7 +59,7 @@ To override this, ~:labels~ can be used to set explicit colors for certain strin
 
 You can switch the arrow direction at anytime with ~>~ and ~<~.
 
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:chain a b < c d e > f g)))
@@ -72,7 +72,7 @@ You can switch the arrow direction at anytime with ~>~ and ~<~.
 :PROPERTIES:
 :ID:       6b103ba2-759e-4d6e-b094-45ca2f0d0b96
 :END:
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:chain a b [label] (:fan c d e) [results] f)
@@ -88,7 +88,7 @@ You can switch the arrow direction at anytime with ~>~ and ~<~.
 :END:
 ~:group~ creates a logical grouping of nodes for applying styling, borders, and generally grouping things.
 ~:cluster~ similarly creates a group, but also then adds the cluster name to all generated names as =cluster_node=.
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:group
@@ -118,7 +118,7 @@ You can switch the arrow direction at anytime with ~>~ and ~<~.
 :ID:       c430e173-b025-4c0f-9ff2-6d2e01f25bd1
 :END:
 A shorthand for specifying the default properties of nodes.
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:node :shape circle :color cyan)
@@ -133,7 +133,7 @@ A shorthand for specifying the default properties of nodes.
 :ID:       feb3b50a-e0d2-4d50-90cf-fee90a6d5dad
 :END:
 For setting the explicit =rank= of a list of nodes.
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:chain a b c d)))
@@ -143,7 +143,7 @@ For setting the explicit =rank= of a list of nodes.
 #+RESULTS:
 [[file:Syntax and Examples--rank.svg]]
 
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    '(:filename "Syntax and Examples--rank-alt1.svg")
    '((:rank min c d)
@@ -153,7 +153,7 @@ For setting the explicit =rank= of a list of nodes.
 #+RESULTS:
 [[file:Syntax and Examples--rank-alt1.svg]]
 
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    '(:filename "Syntax and Examples--rank-alt2.svg")
    '((:rank same a b)
@@ -171,7 +171,7 @@ For setting the explicit =rank= of a list of nodes.
 :END:
 The ~:scope~ helper is to make working with clusters (and nested clusters) more convenient.
 
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:group
@@ -202,7 +202,7 @@ The ~:scope~ helper is to make working with clusters (and nested clusters) more 
 :ID:       b43c7083-7288-4102-a082-5a4a427c7471
 :END:
 This complex type creates channels of nodes that are connected to show a sequence. It... just makes more sense if you see it.
-#+begin_src elisp :results file
+#+begin_src elisp :results file :exports both :exports both
   (rysco-graph
    nil
    '((:sequence
