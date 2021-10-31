@@ -1,22 +1,4 @@
 
-# Table of Contents
-
-1.  [Introduction](#org93ffd97)
-2.  [Installation](#orgb8d516c)
-    1.  [Using straight.el](#orgbb6775f)
-3.  [Syntax and Examples](#org34363e8)
-    1.  [:labels](#orgb5ebb39)
-    2.  [:chain](#org64ffce1)
-    3.  [:fan](#org7b24c99)
-    4.  [:group and :cluster](#orgacdd461)
-    5.  [:node](#orgaf89e07)
-    6.  [:rank](#org9d6f570)
-    7.  [:properties](#org5f10f3e)
-    8.  [:scope](#orgb5051d9)
-    9.  [:sequence](#orgb606ca8)
-
-
-<a id="org93ffd97"></a>
 
 # Introduction
 
@@ -27,24 +9,16 @@ Many options are simply passed through, while other common patterns are made eas
 See below for examples:
 
 
-<a id="orgb8d516c"></a>
-
 # Installation
 
-
-<a id="orgbb6775f"></a>
 
 ## Using straight.el
 
     (straight-use-package '(rysco-graph :type git :repo "git@bitbucket.org:scott105/rysco-graph.git"))
 
 
-<a id="org34363e8"></a>
-
 # Syntax and Examples
 
-
-<a id="orgb5ebb39"></a>
 
 ## :labels
 
@@ -68,8 +42,6 @@ To override this, `:labels` can be used to set explicit colors for certain strin
 ![img](Syntax and Examples--labels.svg)
 
 
-<a id="org64ffce1"></a>
-
 ## :chain
 
     (rysco-graph
@@ -92,8 +64,6 @@ You can switch the arrow direction at anytime with `>` and `<`.
 ![img](Syntax and Examples--chain.svg)
 
 
-<a id="org7b24c99"></a>
-
 ## :fan
 
     (rysco-graph
@@ -103,8 +73,6 @@ You can switch the arrow direction at anytime with `>` and `<`.
 
 ![img](Syntax and Examples--fan.svg)
 
-
-<a id="orgacdd461"></a>
 
 ## :group and :cluster
 
@@ -133,8 +101,6 @@ You can switch the arrow direction at anytime with `>` and `<`.
 ![img](Syntax and Examples--group and -cluster.svg)
 
 
-<a id="orgaf89e07"></a>
-
 ## :node
 
 A shorthand for specifying the default properties of nodes.
@@ -146,8 +112,6 @@ A shorthand for specifying the default properties of nodes.
 
 ![img](Syntax and Examples--node.svg)
 
-
-<a id="org9d6f570"></a>
 
 ## :rank
 
@@ -175,16 +139,13 @@ For setting the explicit `rank` of a list of nodes.
 ![img](Syntax and Examples--rank-alt2.svg)
 
 
-<a id="org5f10f3e"></a>
-
 ## :properties
 
-
-<a id="orgb5051d9"></a>
 
 ## :scope
 
 The `:scope` helper is to make working with clusters (and nested clusters) more convenient.
+Prefixing a node name with `^` will cause that node name to be evaluated without any scoping.
 
     (rysco-graph
      nil
@@ -208,8 +169,6 @@ The `:scope` helper is to make working with clusters (and nested clusters) more 
 
 ![img](Syntax and Examples--scope.svg)
 
-
-<a id="orgb606ca8"></a>
 
 ## :sequence
 

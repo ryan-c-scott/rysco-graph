@@ -1,3 +1,5 @@
+#+options: toc:nil
+
 * Introduction
 Originally developed for my Emacs setup "Ryscomacs", rysco-graph is a domain specific language in Lisp for the Graphviz dot syntax and tools.
 
@@ -170,6 +172,7 @@ For setting the explicit =rank= of a list of nodes.
 :ID:       fc4d3c4f-b446-45c7-9c14-9b7bd67112be
 :END:
 The ~:scope~ helper is to make working with clusters (and nested clusters) more convenient.
+Prefixing a node name with =^= will cause that node name to be evaluated without any scoping.
 
 #+begin_src elisp :results file :exports both
   (rysco-graph
@@ -198,11 +201,8 @@ The ~:scope~ helper is to make working with clusters (and nested clusters) more 
 [[file:Syntax and Examples--scope.svg]]
 
 ** :sequence
-:PROPERTIES:
-:ID:       b43c7083-7288-4102-a082-5a4a427c7471
-:END:
 This complex type creates channels of nodes that are connected to show a sequence. It... just makes more sense if you see it.
-#+begin_src elisp :results file :exports both :exports both
+#+begin_src elisp :results file :exports both
   (rysco-graph
    nil
    '((:sequence

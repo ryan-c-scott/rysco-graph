@@ -9,15 +9,15 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 276)">
 <title>patch</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-276 472,-276 472,4 -4,4"/>
-<g id="clust2" class="cluster">
-<title>cluster_thiscluster</title>
-<polygon fill="none" stroke="black" points="126,-8 126,-83 460,-83 460,-8 126,-8"/>
-<text text-anchor="middle" x="293" y="-67.8" font-family="Times New Roman,serif" font-size="14.00">CLUSTER</text>
-</g>
 <g id="clust1" class="cluster">
 <title>cluster_thisgroup</title>
 <polygon fill="none" stroke="black" points="8,-8 8,-264 118,-264 118,-8 8,-8"/>
 <text text-anchor="middle" x="63" y="-248.8" font-family="Times New Roman,serif" font-size="14.00">GROUP</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_thiscluster</title>
+<polygon fill="none" stroke="black" points="126,-8 126,-83 460,-83 460,-8 126,-8"/>
+<text text-anchor="middle" x="293" y="-67.8" font-family="Times New Roman,serif" font-size="14.00">CLUSTER</text>
 </g>
 <!-- a -->
 <g id="node1" class="node">
