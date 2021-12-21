@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
 (require 'dash)
+(require 'cl)
 
 ;;;;;; Graphing utilities
 (require 'graphviz-dot-mode)
