@@ -148,7 +148,7 @@
         (loop
          with prefix
          for n in nodes
-         concat (format "%s%s" (or prefix "") n)
+         concat (format "%s%s" (or prefix "") (rysco-graph--scope-node n))
          do (setq prefix ", ")))))
 
      (`(:labels . ,data)
