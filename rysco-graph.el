@@ -199,9 +199,11 @@
                    props label color-cache rand-state layers)
                   "")))))
      (`(,from ,to)
-      (insert (format "%s -> %s;\n"
-                      (rysco-graph--render-node-name from)
-                      (rysco-graph--render-node-name to)))))))
+      (let ((color (or (gethash '_ color-cache) "black")))
+        (insert (format "%s -> %s [color=\"%s\"];\n"
+                        (rysco-graph--render-node-name from)
+                        (rysco-graph--render-node-name to)
+                        color)))))))
 
 (cl-defun rysco-graph--render-node-name (name)
   (let* ((name (format "%s" name))
