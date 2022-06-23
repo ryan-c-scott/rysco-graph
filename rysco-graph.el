@@ -146,9 +146,9 @@
         "{rank=%s; %s}\n"
         type
         (loop
-         with prefix
+         with prefix = ""
          for n in nodes
-         concat (format "%s%s" (or prefix "") (rysco-graph--scope-node n))
+         concat (format "%s%s" prefix n)
          do (setq prefix ", ")))))
 
      (`(:labels . ,data)
@@ -299,6 +299,13 @@
     (setq rysco-graph--scope root)
     (prog1 (rysco-graph--process from connection-properties data reverse)
       (setq rysco-graph--scope old-root))))
+
+(cl-defun rysco-graph--rank (type nodes)
+  `((,(append
+       `(:rank ,type)
+       (loop
+        for n in nodes collect
+        (rysco-graph--scope-node n))))))
 
 (cl-defun rysco-graph--chain (from connection-properties data &optional reverse)
   (loop
@@ -487,6 +494,7 @@
 (cl-defun rysco-graph--process (from connection-properties form &optional reverse)
   (pcase form
     (`(:scope ,root . ,rest) (rysco-graph--scope from connection-properties root rest reverse))
+    (`(:rank ,type . ,rest) (rysco-graph--rank type rest))
     (`(:chain . ,rest) (rysco-graph--chain from connection-properties rest reverse))
     (`(:fan . ,rest) (rysco-graph--fan from connection-properties rest reverse))
     (`(:sequence . ,rest) (rysco-graph--sequence from connection-properties rest reverse))
