@@ -356,6 +356,78 @@
            end)))
      scoped-node)))
 
+(cl-defun rysco-graph--continuum (from connection-properties data &rest rest)
+  (-let* (((name . nodes) data)
+          (cluster-properties (assoc :properties data)))
+    `((
+       ,@(car
+          (rysco-graph--process
+           nil nil
+           `(:cluster
+             ,name
+             ,cluster-properties
+             ,@(loop
+                with node-options
+                for n in nodes
+                as n = (pcase n
+                         (`(:properties . ,_))
+                         (`(:nodes . ,options)
+                          (prog1 nil
+                            (setq node-options options)))
+                         (`(:edges . ,_))
+                         ((pred listp)
+                          (car n))
+                         (_ n))
+                when n collect
+                `(,n
+                  :shape none :style none
+                  :color transparent ,@node-options)))))
+
+       ,@(car
+          (rysco-graph--process
+           nil nil
+           `(:scope
+             ,name
+             :rank same
+             ,@(loop
+                for n in nodes
+                as n = (pcase n
+                         (`(:properties . ,_))
+                         (`(:nodes . ,_))
+                         (`(:edges . ,_))
+                         ((pred listp)
+                          (car n))
+                         (_ n))
+                when n collect n))))
+
+       ,@(car
+          (rysco-graph--process
+           nil nil
+           `(:scope
+             ,name
+             :chain
+             ,@(loop
+                with edge-options
+                for n in nodes
+                as minlen = 0
+                as n = (pcase n
+                         (`(:properties . ,_))
+                         (`(:nodes . ,_))
+                         (`(:edges . ,options)
+                          (prog1 nil
+                            (setq edge-options options)))
+                         ((pred listp)
+                          (setq minlen (cadr n))
+                          (car n))
+                         (_ n))
+
+                when n append
+                `(,n [""
+                      :penwidth 3
+                      :arrowhead none
+                      ,@edge-options
+                      :minlen ,minlen])))))))))
+
 (cl-defun rysco-graph--sequence (from connection-properties data &rest rest)
   (-let* (((name columns . entries) data)
           (spans (cl-make-hash-table :test 'equal))
@@ -497,6 +569,7 @@
     (`(:rank ,type . ,rest) (rysco-graph--rank type rest))
     (`(:chain . ,rest) (rysco-graph--chain from connection-properties rest reverse))
     (`(:fan . ,rest) (rysco-graph--fan from connection-properties rest reverse))
+    (`(:continuum . ,rest) (rysco-graph--continuum from connection-properties rest reverse))
     (`(:sequence . ,rest) (rysco-graph--sequence from connection-properties rest reverse))
     (`(,(or :group :cluster) . ,_)
      `((,(rysco-graph--convert-group form))))
