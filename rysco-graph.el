@@ -25,6 +25,12 @@
         0.5)
      2)))
 
+(cl-defun rysco-graph--cached-color-set (key color cache)
+  (puthash (format "%s" key) color cache))
+
+(cl-defun rysco-graph--cached-color-get (key cache)
+  (gethash (format "%s" key) cache))
+
 (defun rysco-graph--render-layer-visible (all-layers obj-layer)
   (or (or (eq all-layers nil)
           (eq obj-layer nil))
@@ -48,9 +54,9 @@
             ('RCOL (rysco-graph--render-generate-color rand-state))
             ('UCOL
              (when color-cache
-               (--if-let (gethash id color-cache)
+               (--if-let (rysco-graph--cached-color-get id color-cache)
                    it
-                 (puthash
+                 (rysco-graph--cached-color-set
                   id
                   (setq color
                         (rysco-graph--render-generate-color rand-state))
@@ -154,7 +160,7 @@
      (`(:labels . ,data)
       (loop
        for (k v) on data by 'cddr do
-       (puthash k (format "%s" v ) color-cache)))
+       (rysco-graph--cached-color-set k (format "%s" v) color-cache)))
 
      (`((,(and (or (pred stringp) (pred symbolp)) mod-name) . ,data) . ,_)
       (insert
@@ -182,12 +188,12 @@
                (rysco-graph--render-plist-to-settings
                    props nil color-cache rand-state layers))))
      (`(,from (,to ,label . ,props))
-      (let ((color (gethash label color-cache)))
+      (let ((color (rysco-graph--cached-color-get label color-cache)))
         (unless color
           (setq color
                 (or (plist-get props :color)
                     (rysco-graph--render-generate-color rand-state)))
-          (puthash label color color-cache))
+          (rysco-graph--cached-color-set label color color-cache))
         (insert
          (format "%s -> %s [label=\"%s\", color=\"%s\", fontcolor=\"%s\", %s];\n"
                  (rysco-graph--render-node-name from)
@@ -199,7 +205,7 @@
                    props label color-cache rand-state layers)
                   "")))))
      (`(,from ,to)
-      (let ((color (or (gethash '_ color-cache) "black")))
+      (let ((color (or (rysco-graph--cached-color-get '_ color-cache) "black")))
         (insert (format "%s -> %s [color=\"%s\"];\n"
                         (rysco-graph--render-node-name from)
                         (rysco-graph--render-node-name to)
