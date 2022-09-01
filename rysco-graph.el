@@ -42,7 +42,7 @@
         (--any? (cl-member it all-layers :test 'string-equal) current-layers))))
 
 (cl-defun rysco-graph--render-plist-to-settings (data &optional id color-cache rand-state layers ignore)
-  (loop
+  (cl-loop
    with out
    with obj-layer = (plist-get data :layer)
    with visible = (rysco-graph--render-layer-visible layers obj-layer)
@@ -79,7 +79,7 @@
       "fontcolor=\"#FF000000\", bgcolor=\"#FF000000\", color=\"#FF000000\""))))
 
 (defun rysco-graph--render-properties (data &optional layers)
-  (loop
+  (cl-loop
    with out
    with obj-layer = (plist-get data :layer)
    with visible = (rysco-graph--render-layer-visible layers obj-layer)
@@ -108,7 +108,7 @@
       "fontcolor=\"#FF000000\"; bgcolor=\"#FF000000\"; color=\"#FF000000\";\n"))))
 
 (cl-defun rysco-graph--render-nodes (patch &key path name subgraph prefix properties rand-state color-cache layers ignore)
-  (loop
+  (cl-loop
    with entry-prefix = (if path (format "%s_" path) "")
 
    for entry in patch do
@@ -151,14 +151,14 @@
        (format
         "{rank=%s; %s}\n"
         type
-        (loop
+        (cl-loop
          with prefix
          for n in nodes
          concat (format "%s%s" (or prefix "") (rysco-graph--scope-node n))
          do (setq prefix ", ")))))
 
      (`(:labels . ,data)
-      (loop
+      (cl-loop
        for (k v) on data by 'cddr do
        (rysco-graph--cached-color-set k (format "%s" v) color-cache)))
 
@@ -277,7 +277,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (cl-defun rysco-graph--fan (from connection-properties data &optional reverse)
-  (loop
+  (cl-loop
    with results
    with anchors
    with connection-properties = connection-properties
@@ -307,7 +307,7 @@
       (setq rysco-graph--scope old-root))))
 
 (cl-defun rysco-graph--chain (from connection-properties data &optional reverse)
-  (loop
+  (cl-loop
    with results
    with anchors = from
    with connection-properties = connection-properties
@@ -344,7 +344,7 @@
 (cl-defun rysco-graph--node (from connection-properties node &optional reverse)
   (let ((scoped-node (rysco-graph--scope-node node)))
     (list
-     (loop
+     (cl-loop
       for anchor in from
       as start = (if reverse scoped-node anchor)
       as end = (if reverse anchor scoped-node)
@@ -374,7 +374,7 @@
                                     it))
                            columns))))
 
-    (loop
+    (cl-loop
      for head in columns
      for i from 0
      do
@@ -387,7 +387,7 @@
          `(:label ,(upcase (format "%s" head)))))
       headers))
 
-    (loop
+    (cl-loop
      for (from to conn . conn-props) in entries
      for y from 1
      as start = (funcall header-index from)
@@ -395,7 +395,7 @@
      as backward = (> start end)
 
      do
-     (loop
+     (cl-loop
       for i from (min start end) below (max start end)
       as id = (format "%s_%s_%s" name i y)
       as at-end = (= i (- end (if backward 0 1)))
@@ -427,7 +427,7 @@
        spans)))
 
     ;; Actual matrix
-    `((,@(loop
+    `((,@(cl-loop
           for y from 0 below (+ (length entries) 2) ; +Header & Footer
           as lasty = (when (> y 0) (1- y))
           as rank-group = nil
@@ -435,7 +435,7 @@
           as at-footer = (= y (1+ (length entries)))
 
           append
-          (loop
+          (cl-loop
            for x from 0 below (length columns)
            as lastx = (when (> x 0) (1- x))
 
@@ -473,7 +473,7 @@
        ;;
        (:group
         ,name
-        ,@(loop
+        ,@(cl-loop
            for (node . node-props) in node-style collect
            `((,node ,@node-props))))))))
 
@@ -481,7 +481,7 @@
   (-let [(type name . rest) data]
     `(,type
       ,name
-      ,@(loop
+      ,@(cl-loop
          for entry in rest collect
          (pcase entry
            (`(,(or :group :cluster) . ,_)
@@ -513,7 +513,7 @@
 (cl-defun rysco-graph (args forms)
   (apply
    'rysco-graph--render
-   (loop
+   (cl-loop
     for f in forms append
     (car (rysco-graph--process nil nil f)))
    args))
