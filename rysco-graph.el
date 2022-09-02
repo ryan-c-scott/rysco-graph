@@ -25,6 +25,12 @@
         0.5)
      2)))
 
+(cl-defun rysco-graph--cached-color-set (key color cache)
+  (puthash (format "%s" key) color cache))
+
+(cl-defun rysco-graph--cached-color-get (key cache)
+  (gethash (format "%s" key) cache))
+
 (defun rysco-graph--render-layer-visible (all-layers obj-layer)
   (or (or (eq all-layers nil)
           (eq obj-layer nil))
@@ -36,7 +42,7 @@
         (--any? (cl-member it all-layers :test 'string-equal) current-layers))))
 
 (cl-defun rysco-graph--render-plist-to-settings (data &optional id color-cache rand-state layers ignore)
-  (loop
+  (cl-loop
    with out
    with obj-layer = (plist-get data :layer)
    with visible = (rysco-graph--render-layer-visible layers obj-layer)
@@ -48,9 +54,9 @@
             ('RCOL (rysco-graph--render-generate-color rand-state))
             ('UCOL
              (when color-cache
-               (--if-let (gethash id color-cache)
+               (--if-let (rysco-graph--cached-color-get id color-cache)
                    it
-                 (puthash
+                 (rysco-graph--cached-color-set
                   id
                   (setq color
                         (rysco-graph--render-generate-color rand-state))
@@ -73,7 +79,7 @@
       "fontcolor=\"#FF000000\", bgcolor=\"#FF000000\", color=\"#FF000000\""))))
 
 (defun rysco-graph--render-properties (data &optional layers)
-  (loop
+  (cl-loop
    with out
    with obj-layer = (plist-get data :layer)
    with visible = (rysco-graph--render-layer-visible layers obj-layer)
@@ -102,7 +108,7 @@
       "fontcolor=\"#FF000000\"; bgcolor=\"#FF000000\"; color=\"#FF000000\";\n"))))
 
 (cl-defun rysco-graph--render-nodes (patch &key path name subgraph prefix properties rand-state color-cache layers ignore)
-  (loop
+  (cl-loop
    with entry-prefix = (if path (format "%s_" path) "")
 
    for entry in patch do
@@ -145,16 +151,16 @@
        (format
         "{rank=%s; %s}\n"
         type
-        (loop
+        (cl-loop
          with prefix = ""
          for n in nodes
          concat (format "%s%s" prefix n)
          do (setq prefix ", ")))))
 
      (`(:labels . ,data)
-      (loop
+      (cl-loop
        for (k v) on data by 'cddr do
-       (puthash k (format "%s" v ) color-cache)))
+       (rysco-graph--cached-color-set k (format "%s" v) color-cache)))
 
      (`((,(and (or (pred stringp) (pred symbolp)) mod-name) . ,data) . ,_)
       (insert
@@ -182,12 +188,12 @@
                (rysco-graph--render-plist-to-settings
                    props nil color-cache rand-state layers))))
      (`(,from (,to ,label . ,props))
-      (let ((color (gethash label color-cache)))
+      (let ((color (rysco-graph--cached-color-get label color-cache)))
         (unless color
           (setq color
                 (or (plist-get props :color)
                     (rysco-graph--render-generate-color rand-state)))
-          (puthash label color color-cache))
+          (rysco-graph--cached-color-set label color color-cache))
         (insert
          (format "%s -> %s [label=\"%s\", color=\"%s\", fontcolor=\"%s\", %s];\n"
                  (rysco-graph--render-node-name from)
@@ -199,7 +205,7 @@
                    props label color-cache rand-state layers)
                   "")))))
      (`(,from ,to)
-      (let ((color (or (gethash '_ color-cache) "black")))
+      (let ((color (or (rysco-graph--cached-color-get '_ color-cache) "black")))
         (insert (format "%s -> %s [color=\"%s\"];\n"
                         (rysco-graph--render-node-name from)
                         (rysco-graph--render-node-name to)
@@ -271,7 +277,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (cl-defun rysco-graph--fan (from connection-properties data &optional reverse)
-  (loop
+  (cl-loop
    with results
    with anchors
    with connection-properties = connection-properties
@@ -308,7 +314,7 @@
         (rysco-graph--scope-node n))))))
 
 (cl-defun rysco-graph--chain (from connection-properties data &optional reverse)
-  (loop
+  (cl-loop
    with results
    with anchors = from
    with connection-properties = connection-properties
@@ -345,7 +351,7 @@
 (cl-defun rysco-graph--node (from connection-properties node &optional reverse)
   (let ((scoped-node (rysco-graph--scope-node node)))
     (list
-     (loop
+     (cl-loop
       for anchor in from
       as start = (if reverse scoped-node anchor)
       as end = (if reverse anchor scoped-node)
@@ -447,7 +453,7 @@
                                     it))
                            columns))))
 
-    (loop
+    (cl-loop
      for head in columns
      for i from 0
      do
@@ -460,7 +466,7 @@
          `(:label ,(upcase (format "%s" head)))))
       headers))
 
-    (loop
+    (cl-loop
      for (from to conn . conn-props) in entries
      for y from 1
      as start = (funcall header-index from)
@@ -468,7 +474,7 @@
      as backward = (> start end)
 
      do
-     (loop
+     (cl-loop
       for i from (min start end) below (max start end)
       as id = (format "%s_%s_%s" name i y)
       as at-end = (= i (- end (if backward 0 1)))
@@ -500,7 +506,7 @@
        spans)))
 
     ;; Actual matrix
-    `((,@(loop
+    `((,@(cl-loop
           for y from 0 below (+ (length entries) 2) ; +Header & Footer
           as lasty = (when (> y 0) (1- y))
           as rank-group = nil
@@ -508,7 +514,7 @@
           as at-footer = (= y (1+ (length entries)))
 
           append
-          (loop
+          (cl-loop
            for x from 0 below (length columns)
            as lastx = (when (> x 0) (1- x))
 
@@ -546,7 +552,7 @@
        ;;
        (:group
         ,name
-        ,@(loop
+        ,@(cl-loop
            for (node . node-props) in node-style collect
            `((,node ,@node-props))))))))
 
@@ -554,7 +560,7 @@
   (-let [(type name . rest) data]
     `(,type
       ,name
-      ,@(loop
+      ,@(cl-loop
          for entry in rest collect
          (pcase entry
            (`(,(or :group :cluster) . ,_)
@@ -588,7 +594,7 @@
 (cl-defun rysco-graph (args forms)
   (apply
    'rysco-graph--render
-   (loop
+   (cl-loop
     for f in forms append
     (car (rysco-graph--process nil nil f)))
    args))
