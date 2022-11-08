@@ -229,9 +229,12 @@
                      (if (listp layers)
                          layers
                        `(,layers))))))
+          (extension (if filename
+                         (file-name-extension filename)
+                       "svg"))
           (filename (or filename
                         (rysco-graph--render-guess-filename)))
-          (out-path (format "%s.svg" (file-name-sans-extension temp-path)))
+          (out-path (format "%s.%s" (file-name-sans-extension temp-path) extension))
           out-code)
 
     (with-temp-buffer
@@ -263,7 +266,7 @@
 
     (if as-code
         out-code
-      (-let* ((graphviz-dot-preview-extension "svg")
+      (-let* ((graphviz-dot-preview-extension extension)
               (command-result (string-trim
                                (shell-command-to-string
                                 (graphviz-compile-command temp-path)))))
