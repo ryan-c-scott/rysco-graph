@@ -6,6 +6,12 @@
 ;;;;;; Graphing utilities
 (require 'graphviz-dot-mode)
 
+(defvar rysco-graph-error-buffer-name "*graphviz errors*"
+  "Buffer name to use when reporting error output from graphviz")
+
+(defvar rysco-graph-show-source-buffer nil
+  "Retain the source generated source code, regardless of success/failure.")
+
 (cl-defun rysco-graph--render-guess-filename (&optional ext)
   (when (boundp 'out)
     out)
@@ -218,6 +224,13 @@
          (port (if split (substring name split) "")))
     (format "\"%s\"%s" node port)))
 
+(cl-defun rysco-graph-report-errors (code errors)
+  (with-current-buffer (get-buffer-create rysco-graph-error-buffer-name)
+    (erase-buffer)
+    (insert code)
+    ;; TODO: Mark errors inline with the code using overlays
+    (insert errors)))
+
 (cl-defun rysco-graph--render (patch &key filename graph-code rand-seed layers as-code ignore)
   (-let* ((temp-path (make-temp-file "patch" nil ".dot"))
           (color-cache (make-hash-table :test 'equal))
@@ -260,8 +273,8 @@
 
       (insert "\n}\n")
 
-      (if as-code
-          (setq out-code (buffer-string))
+      (setq out-code (buffer-string))
+      (unless as-code
         (write-file temp-path)))
 
     (if as-code
@@ -270,13 +283,14 @@
               (command-result (string-trim
                                (shell-command-to-string
                                 (graphviz-compile-command temp-path)))))
-        (if (string-prefix-p "Error:" command-result)
-            (message command-result)
+        (when (or (string-prefix-p "Error:" command-result)
+                  rysco-graph-show-source-buffer)
+          (rysco-graph-report-errors out-code command-result))
 
-          (delete-file temp-path)
+        (delete-file temp-path)
 
-          (rename-file out-path filename t)
-          filename)))))
+        (rename-file out-path filename t)
+        filename))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (cl-defun rysco-graph--fan (from connection-properties data &optional reverse)
