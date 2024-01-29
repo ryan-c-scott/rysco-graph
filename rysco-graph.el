@@ -312,7 +312,7 @@
 (cl-defun rysco-graph--rank (type nodes)
   `((,(append
        `(:rank ,type)
-       (loop
+       (cl-loop
         for n in nodes collect
         (rysco-graph--scope-node n))))))
 
@@ -375,7 +375,7 @@
            `(:cluster
              ,name
              ,cluster-properties
-             ,@(loop
+             ,@(cl-loop
                 with node-options
                 for n in nodes
                 as n = (pcase n
@@ -398,7 +398,7 @@
            `(:scope
              ,name
              :rank same
-             ,@(loop
+             ,@(cl-loop
                 for n in nodes
                 as n = (pcase n
                          (`(:properties . ,_))
@@ -415,7 +415,7 @@
            `(:scope
              ,name
              :chain
-             ,@(loop
+             ,@(cl-loop
                 with edge-options
                 for n in nodes
                 as minlen = 0
